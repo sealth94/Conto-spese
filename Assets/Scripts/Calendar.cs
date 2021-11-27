@@ -9,9 +9,9 @@ public class Calendar : MonoBehaviour
 {
     [SerializeField]
     TrackMoney trackMoney;
-    [SerializeField]
-    TextMeshProUGUI monthlyExpenses;
-
+    [SerializeField] //DEVI AGGIUNGERE LE SCRITTE NELLA SCHERMATA DI DESTRA
+    TextMeshProUGUI monthlyExpenses, freeTimeExpenses, foodExpenses, transportsExpenses, homeExpenses, healthExpenses, studyExpenses, otherExpenses;
+     
     /// <summary>
     /// Cell or slot in the calendar. All the information each day should now about itself
     /// </summary>
@@ -85,7 +85,7 @@ public class Calendar : MonoBehaviour
     /// <summary>
     /// In start we set the Calendar to the current date
     /// </summary>
-    private void Start()
+    private void OnEnable()
     {
         UpdateCalendar(DateTime.Now.Year, DateTime.Now.Month);
     }
@@ -146,6 +146,14 @@ public class Calendar : MonoBehaviour
         {
             days[(DateTime.Now.Day - 1) + startDay].UpdateColor(Color.green);
         }
+
+        freeTimeExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.FreeTime);
+        foodExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Alimentari);
+        transportsExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Trasporti);
+        homeExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Casa);
+        healthExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Salute);
+        studyExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Studio);
+        otherExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Altro);
 
         ///This set the monthly expenses
         monthlyExpenses.text = trackMoney.MonthlyExpenses(currDate);

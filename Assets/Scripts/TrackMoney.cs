@@ -70,6 +70,9 @@ public class TrackMoney : MonoBehaviour {
 
     }
 
+    /// <summary>
+    /// Return a string with the monthly expenses
+    /// </summary>
     public string MonthlyExpenses(DateTime selectedDate)
     {
         float spent = 0;
@@ -83,6 +86,25 @@ public class TrackMoney : MonoBehaviour {
         }
 
         return "Spese del mese: " + spent;
+    }
+
+    /// <summary>
+    /// Return a string with the monthly expenses, in the specified category
+    /// </summary>
+    public string MonthlyExpensesByCategory(DateTime selectedDate, kindOfExpense kindOfExpense)
+    {
+        float spent = 0;
+
+        foreach (var item in data.expensesInfoSave)
+        {
+            if (item.dateTime.Year == selectedDate.Year && item.dateTime.Month == selectedDate.Month)
+            {
+                if (item.expenseCategory.Contains(kindOfExpense.ToString()))
+                { spent += item.expenseAmmount; }
+            }
+        }
+
+        return $"Spese {kindOfExpense}: {spent}";
     }
 
     public void addExpense()
@@ -118,6 +140,7 @@ public class TrackMoney : MonoBehaviour {
         }
 
         SaveLoad.SaveData();
+        data = SaveLoad.LoadData();
         print(totalSpent);
         print(expensesInfoSavesList[expensesInfoSavesList.Count - 1].expenseType);
     }
