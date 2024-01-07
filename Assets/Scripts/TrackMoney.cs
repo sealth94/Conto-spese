@@ -19,7 +19,7 @@ public enum kindOfExpense
 
 public class TrackMoney : MonoBehaviour {
 
-    DataController data;
+    public DataController data { get; private set; }
     public static float totalSpent;
 
     public Text moneySpent;
