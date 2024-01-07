@@ -7,8 +7,6 @@ using TMPro;
 
 public class Calendar : MonoBehaviour
 {
-    [SerializeField]
-    TrackMoney trackMoney;
     [SerializeField] //DEVI AGGIUNGERE LE SCRITTE NELLA SCHERMATA DI DESTRA
     TextMeshProUGUI monthlyExpenses, freeTimeExpenses, foodExpenses, transportsExpenses, homeExpenses, healthExpenses, studyExpenses, otherExpenses;
      
@@ -24,12 +22,13 @@ public class Calendar : MonoBehaviour
         /// <summary>
         /// Constructor of Day
         /// </summary>
-        public Day(int dayNum, Color dayColor, GameObject obj)
+        public Day(int dayNum, Color dayColor, GameObject obj, DateTime monthYear)
         {
             this.dayNum = dayNum;
             this.obj = obj;
+
             UpdateColor(dayColor);
-            UpdateDay(dayNum);
+            UpdateDay(dayNum, monthYear);
         }
 
         /// <summary>
@@ -45,17 +44,34 @@ public class Calendar : MonoBehaviour
         /// When updating the day we decide whether we should show the dayNum based on the color of the day
         /// This means the color should always be updated before the day is updated
         /// </summary>
-        public void UpdateDay(int newDayNum)
+        public void UpdateDay(int newDayNum, DateTime monthYear)
         {
             this.dayNum = newDayNum;
             if (dayColor == Color.white || dayColor == Color.green)
             {
                 obj.GetComponentInChildren<TextMeshProUGUI>().text = (dayNum + 1).ToString();
+                UpdateCategoryBullet(new DateTime(monthYear.Year, monthYear.Month, dayNum + 1));
             }
             else
             {
                 obj.GetComponentInChildren<TextMeshProUGUI>().text = "";
             }
+        }
+
+        /// <summary>
+        /// Aggiorna i 'Bullet' delle categorie, in base a cosa è stato speso quel giorno
+        /// </summary>
+        /// <param name="currentDate"></param>
+        private void UpdateCategoryBullet(DateTime currentDate)
+        {
+            ExpenseCategoryBullet bullets = obj.GetComponent<ExpenseCategoryBullet>();
+            bullets.expenseAltro.SetActive(     TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Altro));
+            bullets.expenseCasa.SetActive(      TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Casa));
+            bullets.expenseTrasporti.SetActive( TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Trasporti));
+            bullets.expenseAlimentari.SetActive(TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Alimentari));
+            bullets.expenseFreeTime.SetActive(  TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.FreeTime));
+            bullets.expenseStudio.SetActive(    TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Studio));
+            bullets.expenseSalute.SetActive(    TrackMoney.DailyExpensesByCategoryBool(currentDate, kindOfExpense.Salute));         
         }
     }
 
@@ -113,11 +129,11 @@ public class Calendar : MonoBehaviour
                 int currDay = i;
                 if (currDay < startDay || currDay - startDay >= endDay)
                 {
-                    newDay = new Day(currDay - startDay, Color.grey, dayOfMonth[i].gameObject);
+                    newDay = new Day(currDay - startDay, Color.grey, dayOfMonth[i].gameObject, currDate);
                 }
                 else
                 {
-                    newDay = new Day(currDay - startDay, Color.white, dayOfMonth[i].gameObject);
+                    newDay = new Day(currDay - startDay, Color.white, dayOfMonth[i].gameObject, currDate);
                 }
                 days.Add(newDay);
             }
@@ -137,7 +153,7 @@ public class Calendar : MonoBehaviour
                     days[i].UpdateColor(Color.white);
                 }
 
-                days[i].UpdateDay(i - startDay);
+                days[i].UpdateDay(i - startDay, currDate);
             }
         }
 
@@ -147,16 +163,31 @@ public class Calendar : MonoBehaviour
             days[(DateTime.Now.Day - 1) + startDay].UpdateColor(Color.green);
         }
 
-        freeTimeExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.FreeTime);
-        foodExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Alimentari);
-        transportsExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Trasporti);
-        homeExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Casa);
-        healthExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Salute);
-        studyExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Studio);
-        otherExpenses.text = trackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Altro);
+        freeTimeExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.FreeTime);
+        foodExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Alimentari);
+        transportsExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Trasporti);
+        homeExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Casa);
+        healthExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Salute);
+        studyExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Studio);
+        otherExpenses.text = TrackMoney.MonthlyExpensesByCategory(currDate, kindOfExpense.Altro);
 
         ///This set the monthly expenses
-        monthlyExpenses.text = trackMoney.MonthlyExpenses(currDate);
+        monthlyExpenses.text = TrackMoney.MonthlyExpenses(currDate);
+    }
+
+    public void ShowDailyExpenses(int requestedDay)
+    {
+        DateTime requestedDate = new DateTime(currDate.Year, currDate.Month, requestedDay);
+        freeTimeExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.FreeTime);
+        foodExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Alimentari);
+        transportsExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Trasporti);
+        homeExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Casa);
+        healthExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Salute);
+        studyExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Studio);
+        otherExpenses.text = TrackMoney.DailyExpensesByCategory(requestedDate, kindOfExpense.Altro);
+
+        ///This set the monthly expenses
+        monthlyExpenses.text = TrackMoney.DailyExpenses(requestedDate);
     }
 
     /// <summary>
@@ -186,17 +217,12 @@ public class Calendar : MonoBehaviour
     /// This either adds or subtracts one month from our currDate.
     /// The arrows will use this function to switch to past or future months
     /// </summary>
-    public void SwitchMonth(int direction)
+    public void SwitchMonth(int delta)
     {
-        if (direction < 0)
-        {
-            currDate = currDate.AddMonths(-1);
-        }
-        else
-        {
-            currDate = currDate.AddMonths(1);
-        }
-
+        currDate = currDate.AddMonths(delta);
+      
+        //se arriva uno 0 manterrà la stessa data (refresh)
+        Debug.Log($"delta: {delta}");
         UpdateCalendar(currDate.Year, currDate.Month);
     }
 }

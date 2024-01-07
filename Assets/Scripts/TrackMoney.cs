@@ -19,7 +19,7 @@ public enum kindOfExpense
 
 public class TrackMoney : MonoBehaviour {
 
-    public DataController data { get; private set; }
+    public static DataController data { get; private set; }
     public static float totalSpent;
 
     public Text moneySpent;
@@ -73,7 +73,7 @@ public class TrackMoney : MonoBehaviour {
     /// <summary>
     /// Return a string with the monthly expenses
     /// </summary>
-    public string MonthlyExpenses(DateTime selectedDate)
+    public static string MonthlyExpenses(DateTime selectedDate)
     {
         float spent = 0;
 
@@ -89,9 +89,27 @@ public class TrackMoney : MonoBehaviour {
     }
 
     /// <summary>
+    /// Return a string with the daily expenses
+    /// </summary>
+    public static string DailyExpenses(DateTime selectedDate)
+    {
+        float spent = 0;
+
+        foreach (var item in data.expensesInfoSave)
+        {
+            if (item.dateTime.Year == selectedDate.Year && item.dateTime.Month == selectedDate.Month && item.dateTime.Day == selectedDate.Day)
+            {
+                spent += item.expenseAmmount;
+            }
+        }
+
+        return "Spese del giorno: " + spent;
+    }
+
+    /// <summary>
     /// Return a string with the monthly expenses, in the specified category
     /// </summary>
-    public string MonthlyExpensesByCategory(DateTime selectedDate, kindOfExpense kindOfExpense)
+    public static string MonthlyExpensesByCategory(DateTime selectedDate, kindOfExpense kindOfExpense)
     {
         float spent = 0;
 
@@ -105,6 +123,41 @@ public class TrackMoney : MonoBehaviour {
         }
 
         return $"Spese {kindOfExpense}: {spent}";
+    }
+
+    /// <summary>
+    /// Return a string with the daily expenses, in the specified category
+    /// </summary>
+    public static string DailyExpensesByCategory(DateTime selectedDate, kindOfExpense kindOfExpense)
+    {
+        float spent = 0;
+
+        foreach (var item in data.expensesInfoSave)
+        {
+            if (item.dateTime.Year == selectedDate.Year && item.dateTime.Month == selectedDate.Month && item.dateTime.Day == selectedDate.Day)
+            {
+                if (item.expenseCategory.Contains(kindOfExpense.ToString()))
+                { spent += item.expenseAmmount; }
+            }
+        }
+
+        return $"Spese {kindOfExpense}: {spent}";
+    }
+
+    /// <summary>
+    /// Return bool if you spent something in the given category on the given day
+    /// </summary>
+    public static bool DailyExpensesByCategoryBool(DateTime selectedDate, kindOfExpense kindOfExpense)
+    {
+        foreach (var item in data.expensesInfoSave)
+        {
+            if (item.dateTime.Year == selectedDate.Year && item.dateTime.Month == selectedDate.Month && item.dateTime.Day == selectedDate.Day)
+            {
+                if (item.expenseCategory.Contains(kindOfExpense.ToString()))
+                    return true;
+            }
+        }
+        return false;
     }
 
     public void addExpense()

@@ -17,6 +17,7 @@ public static class SaveLoad{
 
         formatter.Serialize(stream, data);
         stream.Close();
+        Debug.LogWarning("Saved data to: " + path);
     }
 
     public static DataController LoadData()
@@ -31,6 +32,7 @@ public static class SaveLoad{
             DataController data = formatter.Deserialize(stream) as DataController;
 
             stream.Close();
+            Debug.LogWarning("Loaded data from: " + path);
             return data;
         }
 

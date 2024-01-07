@@ -30,7 +30,7 @@ public class ExpensesFilter : MonoBehaviour
         float spent = 0;
         isOk = false;
 
-        foreach (var item in trackMoney.data.expensesInfoSave)
+        foreach (var item in TrackMoney.data.expensesInfoSave)
         {
             DateTimeFilter(item);
             CategoryFilter(item);
