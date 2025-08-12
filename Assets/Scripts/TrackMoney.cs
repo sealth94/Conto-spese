@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using TMPro;
+using System.Globalization;
 
 public enum kindOfExpense
 {
@@ -162,7 +163,8 @@ public class TrackMoney : MonoBehaviour {
 
     public void addExpense()
     {
-        float expenseToAdd = float.Parse(moneySpent.text);
+        string normalized = moneySpent.text.Replace(',', '.');
+        float expenseToAdd = float.Parse(normalized, NumberStyles.Float, CultureInfo.InvariantCulture);
         moneySpent.text = "";
         totalSpent += expenseToAdd;
 
